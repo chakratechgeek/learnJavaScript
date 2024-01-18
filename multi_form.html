@@ -1,0 +1,118 @@
+<!-- Your HTML file -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-Form Example</title>
+</head>
+<body>
+
+<!-- Form 1 -->
+<form id="form1">
+    <label for="field1">His_Name:</label>
+    <input type="text" id="field1" name="field1">
+    <br><br>
+    <label for="field2">Her_Name:</label>
+    <input type="text" id="field2" name="field2">
+    <br>
+    <button type="button" onclick="showNextForm('form1', 'form2')">Next</button>
+</form>
+
+<!-- Form 2 -->
+<form id="form2" style="display: none;">
+    <label for="field3">Activity:</label>
+    <input type="text" id="field3" name="field3">
+    <br>
+    <button type="button" onclick="showNextForm('form2', 'form3')">Next</button>
+    <button type="button" onclick="showPreviousForm('form2', 'form1')">Previous</button>
+</form>
+
+<!-- Form 3 -->
+<form id="form3" style="display: none;">
+    <label for="field4">Intensity:</label>
+    <input type="text" id="field4" name="field4">
+    <br>
+    <button type="button" onclick="submitForms()">Submit</button>
+    <button type="button" onclick="showPreviousForm('form3', 'form2')">Previous</button>
+</form>
+
+<script>
+    var currentFormIndex = 0;
+
+    function showNextForm(currentFormId, nextFormId) {
+        var currentForm = document.getElementById(currentFormId);
+        if (currentForm) {
+            currentForm.style.display = 'none';
+        }
+
+        var nextForm = document.getElementById(nextFormId);
+        if (nextForm) {
+            nextForm.style.display = 'block';
+        }
+
+        currentFormIndex++;
+    }
+
+    function showPreviousForm(currentFormId, previousFormId) {
+        var currentForm = document.getElementById(currentFormId);
+        if (currentForm) {
+            currentForm.style.display = 'none';
+        }
+
+        var previousForm = document.getElementById(previousFormId);
+        if (previousForm) {
+            previousForm.style.display = 'block';
+        }
+
+        currentFormIndex--;
+    }
+
+    function submitForms() {
+        var formData = {
+            field1: document.getElementById('field1').value,
+            field2: document.getElementById('field2').value,
+            field3: document.getElementById('field3').value,
+            field4: document.getElementById('field4').value
+        };
+        console.log(formData);
+
+        // Make an AJAX request to a Django view
+        fetch('/your-django-view-url/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')  // Include CSRF token if you're using Django CSRF protection
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Handle the response from the Django view if needed
+            console.log(data);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+
+</body>
+</html>
